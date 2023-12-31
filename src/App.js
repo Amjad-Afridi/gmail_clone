@@ -1,22 +1,10 @@
-import React from 'react';
-import { GoogleLogin } from '@react-oauth/google';
-import UserData from "./components/UserData";
-
+import React from "react";
+import Header from "./components/Header";
 function App() {
-    const responseMessage = (response) => {
-        console.log(response);
-    };
-    const errorMessage = (error) => {
-        console.log(error);
-    };
-    return (
-        // <div>
-        //     <h2>React Google Login</h2>
-        //     <br />
-        //     <br />
-        //     <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
-        // </div>
-        <UserData/>
-    )
+  return (
+    <>
+      <Header />
+    </>
+  );
 }
 export default App;
