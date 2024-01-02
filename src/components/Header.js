@@ -2,11 +2,11 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { MdOutlineSearch } from "react-icons/md";
 import { PiDotsNineBold } from "react-icons/pi";
 const Header = () => {
-  const iconStyle = "p-2 rounded-full hover:bg-slate-200 hover:cursor-pointer";
+  const iconStyle = "p-2 rounded-full hover:bg-gray-400 hover:cursor-pointer";
   const submitForm = () => {};
   return (
     <>
-      <div className="flex w-full p-4 bg-white items-center">
+      <div className="flex w-full p-4 items-center">
         <div className="flex items-center w-1/4 gap-2 ">
           <div className={iconStyle}>
             <GiHamburgerMenu size={20} />
@@ -21,7 +21,7 @@ const Header = () => {
         </div>
 
         <div className="flex w-full">
-          <div className="flex items-center justify-between md:min-w-[600px] min-w-[300px] bg-gray-100 rounded-full p-1">
+          <div className="flex items-center justify-between md:min-w-[600px] min-w-[300px] bg-gray-300 rounded-full p-1">
             <form onSubmit={submitForm} className="flex mr-2 gap-1">
               <button className={iconStyle}>
                 <MdOutlineSearch size={22} />
