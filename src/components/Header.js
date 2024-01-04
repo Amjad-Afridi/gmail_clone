@@ -8,8 +8,11 @@ const Header = () => {
     <>
       <div className="flex w-full p-4 items-center">
         <div className="flex items-center w-1/4 gap-2 ">
-          <div className={iconStyle}>
+          <div className={iconStyle + "relative"}>
             <GiHamburgerMenu size={20} />
+            <span className="opacity-0 group-hover:opacity-100 absolute inset-b-0 mt-4 hover:flex">
+              Main Menu
+            </span>
           </div>
           <div className="hover:cursor-pointer">
             <img
