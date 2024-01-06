@@ -7,6 +7,7 @@ const UserSlice = createSlice({
     initialState:{
         token: {},
         profile: {},
+        messages:{},
         loading: false,
         error: null
     },

@@ -3,6 +3,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {GoogleLogin, googleLogout, useGoogleLogin} from '@react-oauth/google';
 import {loginInfo, logoutInfo} from "./Redux/Slices/UserSlice";
 import {UserProfile} from "./Redux/Thunks/UserProfile";
+import axios from "axios";
 
 function App() {
     const dispatch = useDispatch()
@@ -13,7 +14,8 @@ function App() {
         onSuccess: (codeResponse) => {
             setUserToken(codeResponse)
         },
-        onError: (error) => console.log('Login Failed:', error)
+        onError: (error) => console.log('Login Failed:', error),
+        scope: 'https://www.googleapis.com/auth/gmail.readonly'
     })
     const handleLogout = () => {
         setUserToken({})
@@ -21,6 +23,37 @@ function App() {
     }
     const getProfile = async () => {
        const result = await dispatch(UserProfile(token))
+    }
+    const searchMessages = async () => {
+        if(profile){
+            console.log(profile)
+            console.log('token is: ', token)
+            try{
+                const result =  await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages`,{
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json'
+                    },
+                    params:{
+                        maxResults: 5
+                    },
+                }
+                )
+                const messages =  result.data.messages.map(async ({id}) => {
+                  await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages/${id}`,{
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: 'application/json'
+                        },
+                    })
+                })
+                // const decodedPayload = atob(meassages.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                // console.log(decodedPayload)
+            }
+            catch(e){
+                console.log(e.message)
+            }
+        }
     }
     if(userToken.access_token){
         dispatch(loginInfo(userToken.access_token))
@@ -32,6 +65,7 @@ function App() {
             {userToken.access_token ? <div>
                 <button onClick={handleLogout}>logout</button>
                 <button onClick={getProfile}>Get Profile</button>
+                <button onClick={searchMessages}>Search Messages</button>
                 {error && <p>{error.message}</p>}
                 {loading && <p>loading</p>}
             </div> : <button onClick={() => login()}>login</button>  }
