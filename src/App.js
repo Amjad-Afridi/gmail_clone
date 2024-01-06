@@ -47,10 +47,23 @@ function App() {
                             Authorization: `Bearer ${token}`,
                             Accept: 'application/json'
                         },
-                    })
+                        params: {
+                            format: "full"
+                        }
+                    }).then((response) => {
+                        // console.log(response.data.payload.parts)
+                        response.data.payload.parts.forEach(part => {
+                            if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
+                                const content = part.body.data;
+                                const safeContent = content.replace(/-/g, '+').replace(/_/g, '/');
+                                console.log('content is ',atob(safeContent))
+                                // const decodedContent = atob(content);
+                                // console.log(decodedContent)
+                                // Process or display the content
+                            }
+                        })
+                    }).catch(e => e.message)
                 })
-                // const decodedPayload = atob(meassages.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-                // console.log(decodedPayload)
             } catch (e) {
                 console.log(e.message)
             }
@@ -62,7 +75,6 @@ function App() {
 
     return (
         <>
-            <Sidebar/>
             <div> login with google</div>
             {userToken.access_token ? <div>
                 <button onClick={handleLogout}>logout</button>
