@@ -1,89 +1,83 @@
-
-import React, {useEffect, useState} from 'react';
-import {useSelector, useDispatch} from "react-redux";
-import {GoogleLogin, googleLogout, useGoogleLogin} from '@react-oauth/google';
-import {loginInfo, logoutInfo} from "./Redux/Slices/UserSlice";
-import {UserProfile} from "./Redux/Thunks/UserProfile";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { GoogleLogin, googleLogout, useGoogleLogin } from "@react-oauth/google";
+import { loginInfo, logoutInfo } from "./Redux/Slices/UserSlice";
+import { UserProfile } from "./Redux/Thunks/UserProfile";
+import { MessageList } from "./Redux/Thunks/MessageList";
 import axios from "axios";
 import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+import MessageItem from "./components/MessageItem";
+import { MessageContent } from "./Redux/Thunks/MessageContent";
 
 function App() {
-    const dispatch = useDispatch()
-    const [userToken, setUserToken] = useState({})
-    const {token, error, loading, profile} = useSelector((state) => state.user)
+  const [htmlContent, setHtmlContent] = useState([]);
+  const [plainContent, setPlainContent] = useState([]);
+  const dispatch = useDispatch();
+  const [userToken, setUserToken] = useState({});
+  const { token, error, loading, profile, messageIds, messagesContent } =
+    useSelector((state) => state.user);
 
-    const login = useGoogleLogin({
-        onSuccess: (codeResponse) => {
-            setUserToken(codeResponse)
-        },
-        onError: (error) => console.log('Login Failed:', error),
-        scope: 'https://www.googleapis.com/auth/gmail.readonly'
-    })
-    const handleLogout = () => {
-        setUserToken({})
-        dispatch(logoutInfo())
-    }
-    const getProfile = async () => {
-        const result = await dispatch(UserProfile(token))
-    }
-    const searchMessages = async () => {
-        if (profile) {
-            console.log(profile)
-            console.log('token is: ', token)
-            try {
-                const result = await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            Accept: 'application/json'
-                        },
-                        params: {
-                            maxResults: 5
-                        },
-                    }
-                )
-                const messages = result.data.messages.map(async ({id}) => {
-                    await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages/${id}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            Accept: 'application/json'
-                        },
-                        params: {
-                            format: "full"
-                        }
-                    }).then((response) => {
-                        // console.log(response.data.payload.parts)
-                        response.data.payload.parts.forEach(part => {
-                            if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
-                                const content = part.body.data;
-                                const safeContent = content.replace(/-/g, '+').replace(/_/g, '/');
-                                console.log('content is ',atob(safeContent))
-                                // const decodedContent = atob(content);
-                                // console.log(decodedContent)
-                                // Process or display the content
-                            }
-                        })
-                    }).catch(e => e.message)
-                })
-            } catch (e) {
-                console.log(e.message)
-            }
-        }
-    }
-    if (userToken.access_token) {
-        dispatch(loginInfo(userToken.access_token))
-    }
-
-    return (
-        <>
-            <div> login with google</div>
-            {userToken.access_token ? <div>
-                <button onClick={handleLogout}>logout</button>
-                <button onClick={getProfile}>Get Profile</button>
-                <button onClick={searchMessages}>Search Messages</button>
-                {error && <p>{error.message}</p>}
-                {loading && <p>loading</p>}
-            </div> : <button onClick={() => login()}>login</button>}
-        </>
-    )
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setUserToken(codeResponse);
+    },
+    onError: (error) => console.log("Login Failed:", error),
+    scope: "https://www.googleapis.com/auth/gmail.readonly",
+  });
+  const handleLogout = () => {
+    setUserToken({});
+    dispatch(logoutInfo());
+  };
+  const getProfile = async () => {
+    const result = await dispatch(UserProfile(token));
+  };
+  const searchMessages = async () => {
+    dispatch(MessageList({ profile, token }));
+  };
+  if (userToken.access_token) {
+    dispatch(loginInfo(userToken.access_token));
+  }
+  const searchMessagesResults = () => {
+    messageIds.map(({ id }) => {
+      return dispatch(MessageContent({ id, profile, token }));
+    });
+  };
+  const loadMessages = () => {
+    messagesContent.map((item) => {
+      console.log(item);
+    });
+  };
+  return (
+    <>
+      <Header />
+      <Sidebar />
+      <br /> <br />
+      <div> login with google</div>
+      {userToken.access_token ? (
+        <div>
+          <button onClick={handleLogout}>logout</button>
+          <br />
+          <button onClick={getProfile}>Get Profile</button>
+          <br />
+          <button onClick={searchMessages}>Search Message IDs</button> <br />
+          <button onClick={searchMessagesResults}>
+            Search Message results
+          </button>
+          <br />
+          <button onClick={loadMessages}>load messages</button>
+          <br />
+          {messagesContent.length && console.log(messagesContent)}
+          {/*  messagesContent.map((item) => {*/}
+          {/*    return <div dangerouslySetInnerHTML={{ __html: item }} />;*/}
+          {/*  })}*/}
+          {error && <p>{error.message}</p>}
+          {loading && <p>loading</p>}
+        </div>
+      ) : (
+        <button onClick={() => login()}>login</button>
+      )}
+    </>
+  );
 }
-export default App
+export default App;
