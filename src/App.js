@@ -11,8 +11,6 @@ import MessageItem from "./components/MessageItem";
 import { MessageContent } from "./Redux/Thunks/MessageContent";
 
 function App() {
-  const [htmlContent, setHtmlContent] = useState([]);
-  const [plainContent, setPlainContent] = useState([]);
   const dispatch = useDispatch();
   const [userToken, setUserToken] = useState({});
   const { token, error, loading, profile, messageIds, messagesContent } =
@@ -65,7 +63,7 @@ function App() {
             Search Message results
           </button>
           <br />
-          {/* <button onClick={loadMessages}>load messages</button> */}
+          <button onClick={loadMessages}>load messages</button>
           <br />
           {messagesContent.length &&
             messagesContent.map((item) => <MessageItem content={item} />)}
