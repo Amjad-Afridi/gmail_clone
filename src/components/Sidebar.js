@@ -6,8 +6,10 @@ import { RiDraftLine } from "react-icons/ri";
 import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
 import { HiOutlinePencil } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const items = [
     {
       id: 1,
@@ -42,7 +44,10 @@ const Sidebar = () => {
   ];
   return (
     <>
-      <button className="flex items-center gap-4 px-4 py-3 my-4 ml-2  rounded-xl bg-blue-200 font-medium hover:drop-shadow-lg ">
+      <button
+        className="flex items-center gap-4 px-4 py-3 my-4 ml-2  rounded-xl bg-blue-200 font-medium hover:drop-shadow-lg "
+        onClick={() => navigate("/message")}
+      >
         <HiOutlinePencil />
         Compose
       </button>
@@ -51,7 +56,12 @@ const Sidebar = () => {
           return (
             <div className="flex items-center justify-start gap-4 px-4 py-2 rounded-r-full hover:bg-gray-300">
               <div>{item.icon}</div>
-              <div className="text-black font-normal">{item.title}</div>
+              <div
+                className="text-black font-normal"
+                onClick={() => navigate("/messagelist")}
+              >
+                {item.title}
+              </div>
             </div>
           );
         })}

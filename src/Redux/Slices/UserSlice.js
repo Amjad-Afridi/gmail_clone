@@ -7,7 +7,7 @@ import { MessageContent } from "../Thunks/MessageContent";
 const UserSlice = createSlice({
   name: "user",
   initialState: {
-    token: {},
+    token: null,
     profile: {},
     messageIds: [],
     messagesContent: [],
@@ -20,7 +20,7 @@ const UserSlice = createSlice({
     },
     logoutInfo: (state) => {
       googleLogout();
-      state.token = {};
+      state.token = null;
     },
   },
   extraReducers: (builder) => {
@@ -41,6 +41,7 @@ const UserSlice = createSlice({
     builder.addCase(MessageList.fulfilled, (state, action) => {
       state.loading = false;
       state.messageIds = action.payload.messages;
+      console.log("messsage IDs are", action.payload.messages);
     });
     builder.addCase(MessageList.rejected, (state, action) => {
       state.loading = false;

@@ -49,9 +49,14 @@ const MessageItem = ({ content }) => {
         className="p-2 border-b-[1px] border-black"
         onClick={expandComponent}
       >
-        {content.snippet}
+        {content.snippet !== ""
+          ? content.snippet
+          : content.payload.headers.filter((item) => item.name === "From")[0]
+              .value}
       </div>
-      {attachmentId && <button onClick={getAttachment}>getAttachment</button>}
+      {attachmentId.length && (
+        <button onClick={getAttachment}>getAttachment</button>
+      )}
       {files && (
         <Document file={files}>
           {" "}

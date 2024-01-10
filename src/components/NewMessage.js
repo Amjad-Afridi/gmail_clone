@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 function NewMessage() {
+  const navigate = useNavigate();
   const [recipients, setRecipients] = useState("");
   const [subject, setSubject] = useState("");
   const [textarea, setTextarea] = useState("");
@@ -11,10 +13,12 @@ function NewMessage() {
     setRecipients("");
     setTextarea("");
     setSubject("");
+    navigate(-1);
   };
 
   const hideMessageBox = () => {
     setShowMessage(false);
+    navigate(-1);
   };
   const handleTextAreaChange = (e) => {
     setTextarea(e.target.value);

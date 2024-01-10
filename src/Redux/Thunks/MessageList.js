@@ -13,10 +13,11 @@ export const MessageList = createAsyncThunk(
           Accept: "application/json",
         },
         params: {
-          maxResults: 5,
+          maxResults: 10,
         },
       },
     );
+    console.log("message list : ", response.data);
     return response.data;
   },
 );

@@ -1,78 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { GoogleLogin, googleLogout, useGoogleLogin } from "@react-oauth/google";
-import { loginInfo, logoutInfo } from "./Redux/Slices/UserSlice";
+import { logoutInfo } from "./Redux/Slices/UserSlice";
 import { UserProfile } from "./Redux/Thunks/UserProfile";
-import { MessageList } from "./Redux/Thunks/MessageList";
+import MessagesList from "./components/MessagesList";
 import axios from "axios";
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
 import MessageItem from "./components/MessageItem";
 import { MessageContent } from "./Redux/Thunks/MessageContent";
+import Login from "./components/Login";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import Home from "./components/Home";
+import NewMessage from "./components/NewMessage";
 
 function App() {
-  const dispatch = useDispatch();
-  const [userToken, setUserToken] = useState({});
-  const { token, error, loading, profile, messageIds, messagesContent } =
-    useSelector((state) => state.user);
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => {
-      setUserToken(codeResponse);
-    },
-    onError: (error) => console.log("Login Failed:", error),
-    scope: "https://www.googleapis.com/auth/gmail.readonly",
-  });
-  const handleLogout = () => {
-    setUserToken({});
-    dispatch(logoutInfo());
-  };
-  const getProfile = async () => {
-    const result = await dispatch(UserProfile(token));
-  };
-  const searchMessages = async () => {
-    dispatch(MessageList({ profile, token }));
-  };
-  if (userToken.access_token) {
-    dispatch(loginInfo(userToken.access_token));
-  }
-  const searchMessagesResults = () => {
-    messageIds.map(({ id }) => {
-      return dispatch(MessageContent({ id, profile, token }));
-    });
-  };
-  const loadMessages = () => {
-    messagesContent.map((item) => {
-      console.log("item is :", item);
-    });
-  };
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/login");
+  }, []);
   return (
     <>
-      <Header />
-      <Sidebar />
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route path="message" element={<NewMessage />} />
+          <Route path="messagelist" element={<MessagesList />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+      </Routes>
       <br /> <br />
-      <div> login with google</div>
-      {userToken.access_token ? (
-        <div>
-          <button onClick={handleLogout}>logout</button>
-          <br />
-          <button onClick={getProfile}>Get Profile</button>
-          <br />
-          <button onClick={searchMessages}>Search Message IDs</button> <br />
-          <button onClick={searchMessagesResults}>
-            Search Message results
-          </button>
-          <br />
-          <button onClick={loadMessages}>load messages</button>
-          <br />
-          {messagesContent.length &&
-            messagesContent.map((item) => <MessageItem content={item} />)}
-          {error && <p>{error.message}</p>}
-          {loading && <p>loading</p>}
-        </div>
-      ) : (
-        <button onClick={() => login()}>login</button>
-      )}
+      {}
     </>
   );
 }

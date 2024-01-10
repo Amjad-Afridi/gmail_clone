@@ -1,7 +1,9 @@
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdOutlineSearch } from "react-icons/md";
 import { PiDotsNineBold } from "react-icons/pi";
+import { useSelector } from "react-redux";
 const Header = () => {
+  const { profile, messagesIds } = useSelector((state) => state.user);
   const iconStyle = "p-2 rounded-full hover:bg-gray-400 hover:cursor-pointer";
   const submitForm = () => {};
   return (
@@ -77,7 +79,7 @@ const Header = () => {
           </div>
           <div className={iconStyle + " p-1"}>
             <img
-              src="https://lh3.googleusercontent.com/ogw/ANLem4a03TJ2Isa0QGwhR1Cd3OGWrmb8FMpW_2Vp5h06_g=s32-c-mo"
+              src={profile.picture}
               srcset="https://lh3.googleusercontent.com/ogw/ANLem4a03TJ2Isa0QGwhR1Cd3OGWrmb8FMpW_2Vp5h06_g=s32-c-mo 1x, https://lh3.googleusercontent.com/ogw/ANLem4a03TJ2Isa0QGwhR1Cd3OGWrmb8FMpW_2Vp5h06_g=s64-c-mo 2x "
               alt="profile-pic"
               className="rounded-full min-w-8"
