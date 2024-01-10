@@ -35,10 +35,10 @@ const MessageItem = ({ content }) => {
           params: {
             format: "full",
           },
-        },
+        }
       )
       .then(
-        (response) => setFiles(response.data.data),
+        (response) => setFiles(response.data.data)
         // replace(/-/g, "+").replace(/_/g, "/")
       );
   };
@@ -46,7 +46,7 @@ const MessageItem = ({ content }) => {
     <>
       <br />
       <div
-        className="p-2 border-b-[1px] border-black"
+        className=" flex p-2 border-b-[1px] border-black"
         onClick={expandComponent}
       >
         {content.snippet !== ""
@@ -54,31 +54,29 @@ const MessageItem = ({ content }) => {
           : content.payload.headers.filter((item) => item.name === "From")[0]
               .value}
       </div>
-      {attachmentId.length && (
+      {/* {attachmentId.length && (
         <button onClick={getAttachment}>getAttachment</button>
-      )}
-      {files && (
+      )} */}
+      {/* {files && (
         <Document file={files}>
           {" "}
           <Page />{" "}
         </Document>
-      )}
+      )} */}
       {plainContent && (
         <pre>
           {atob(plainContent.body.data.replace(/-/g, "+").replace(/_/g, "/"))}
         </pre>
       )}
-      <br />
       {htmlContent && (
         <div
           dangerouslySetInnerHTML={{
             __html: atob(
-              htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
+              htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
             ),
           }}
         />
       )}
-      <br />
     </>
   );
 };

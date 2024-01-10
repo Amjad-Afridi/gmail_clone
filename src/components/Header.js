@@ -79,7 +79,7 @@ const Header = () => {
           </div>
           <div className={iconStyle + " p-1"}>
             <img
-              src={profile.picture}
+              src={profile?.picture}
               srcset="https://lh3.googleusercontent.com/ogw/ANLem4a03TJ2Isa0QGwhR1Cd3OGWrmb8FMpW_2Vp5h06_g=s32-c-mo 1x, https://lh3.googleusercontent.com/ogw/ANLem4a03TJ2Isa0QGwhR1Cd3OGWrmb8FMpW_2Vp5h06_g=s64-c-mo 2x "
               alt="profile-pic"
               className="rounded-full min-w-8"

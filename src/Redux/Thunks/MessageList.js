@@ -15,9 +15,8 @@ export const MessageList = createAsyncThunk(
         params: {
           maxResults: 10,
         },
-      },
+      }
     );
-    console.log("message list : ", response.data);
     return response.data;
-  },
+  }
 );

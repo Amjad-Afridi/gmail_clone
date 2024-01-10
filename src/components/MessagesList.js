@@ -1,3 +1,4 @@
+import { MessageList } from "../Redux/Thunks/MessageList";
 import MessageItem from "./MessageItem";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -7,22 +8,25 @@ const MessagesList = () => {
   const { messagesContent, loading, error, profile, token, messageIds } =
     useSelector((state) => state.user);
   useEffect(() => {
-    console.log("message IDs are: ", messageIds);
     const searchMessagesResults = () => {
-      messageIds.map(({ id }) => {
+      console.log("profile value:", profile);
+      console.log("token value:", token);
+      console.log(" messages IDs :", messageIds);
+      const result = messageIds.map(({ id }) => {
         return dispatch(MessageContent({ id, profile, token }));
       });
     };
     searchMessagesResults();
-  }, []);
+  }, [messageIds, profile]);
 
   return (
     <>
-      <div>this is message list </div>
-      {messagesContent && console.log("messages content is: ", messagesContent)}
-      {/*  messagesContent.map((item) => <MessageItem content={item} />)}*/}
-      {/*{error && <p>{error.message}</p>}*/}
-      {/*{loading && <p>loading messages</p>}*/}
+      <div className="w-[70%]">
+        {messagesContent.length &&
+          messagesContent.map((message) => <MessageItem content={message} />)}
+        {error && <p>{error.message}</p>}
+        {loading && <p>loading messages</p>}
+      </div>
     </>
   );
 };

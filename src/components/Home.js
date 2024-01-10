@@ -4,9 +4,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutInfo } from "../Redux/Slices/UserSlice";
 import { UserProfile } from "../Redux/Thunks/UserProfile";
-import { MessageList } from "../Redux/Thunks/MessageList";
-import { MessageContent } from "../Redux/Thunks/MessageContent";
 import { useEffect } from "react";
+import { MessageList } from "../Redux/Thunks/MessageList";
+import MessagesList from "./MessagesList";
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -17,33 +17,21 @@ const Home = () => {
     dispatch(logoutInfo());
     navigate("/login");
   };
-  // const searchMessagesResults = () => {
-  //   messageIds.map(({ id }) => {
-  //     return dispatch(MessageContent({ id, profile, token }));
-  //   });
-  // };
-  // const loadMessages = () => {
-  //   messagesContent.map((item) => {
-  //     console.log("item is :", item);
-  //   });
-  // };
+
   useEffect(() => {
-    const getProfile = async () => {
-      const result = await dispatch(UserProfile(token));
-      console.log("search profile api result ", result);
-    };
-    getProfile();
-    const searchMessages = async () => {
-      const result = await dispatch(MessageList({ profile, token }));
-      console.log("search messages api result ", result);
+    const searchMessages = () => {
+      dispatch(MessageList({ profile, token }));
     };
     searchMessages();
-  }, []);
+  }, [profile]);
 
   return (
     <>
       <Header />
-      <Sidebar />
+      <div className="flex gap-2">
+        <Sidebar className=" w-[20%]" />
+        <MessagesList className=" w-[80%]" />
+      </div>
       <Outlet />
     </>
   );

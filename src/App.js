@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}>
           <Route path="message" element={<NewMessage />} />
-          <Route path="messagelist" element={<MessagesList />} />
+          {/* <Route path="messagelist" element={<MessagesList />} />                    */}
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

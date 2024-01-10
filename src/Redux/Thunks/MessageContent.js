@@ -13,9 +13,8 @@ export const MessageContent = createAsyncThunk(
         params: {
           format: "full",
         },
-      },
+      }
     );
-    console.log("response data: ", response.data);
     return response.data;
-  },
+  }
 );

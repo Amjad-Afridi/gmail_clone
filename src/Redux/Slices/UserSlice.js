@@ -8,7 +8,7 @@ const UserSlice = createSlice({
   name: "user",
   initialState: {
     token: null,
-    profile: {},
+    profile: null,
     messageIds: [],
     messagesContent: [],
     loading: false,
@@ -41,7 +41,6 @@ const UserSlice = createSlice({
     builder.addCase(MessageList.fulfilled, (state, action) => {
       state.loading = false;
       state.messageIds = action.payload.messages;
-      console.log("messsage IDs are", action.payload.messages);
     });
     builder.addCase(MessageList.rejected, (state, action) => {
       state.loading = false;
@@ -73,6 +72,14 @@ const UserSlice = createSlice({
     });
   },
 });
-export const { error, loading, token, profile, loginInfo, logoutInfo } =
-  UserSlice.actions;
+export const {
+  error,
+  loading,
+  token,
+  profile,
+  messageIds,
+  messagesContent,
+  loginInfo,
+  logoutInfo,
+} = UserSlice.actions;
 export const UserSliceReducer = UserSlice.reducer;

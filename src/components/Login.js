@@ -3,6 +3,7 @@ import { loginInfo } from "../Redux/Slices/UserSlice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { UserProfile } from "../Redux/Thunks/UserProfile";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Login = () => {
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => {
       dispatch(loginInfo(codeResponse.access_token));
+      dispatch(UserProfile(codeResponse.access_token));
       navigate("/");
     },
     onError: (error) => console.log("Login Failed:", error),
