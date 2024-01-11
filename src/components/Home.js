@@ -23,6 +23,7 @@ const Home = () => {
       dispatch(MessageList({ profile, token }));
     };
     searchMessages();
+    navigate("/messages-list");
   }, [profile]);
 
   return (
@@ -30,9 +31,9 @@ const Home = () => {
       <Header />
       <div className="flex gap-2">
         <Sidebar className=" w-[20%]" />
-        <MessagesList className=" w-[80%]" />
+        {/*<MessagesList className="w-[80%]" />*/}
+        <Outlet className="w-[80%] bg-gray-300 rounded-lg px-4 py-4" />
       </div>
-      <Outlet />
     </>
   );
 };

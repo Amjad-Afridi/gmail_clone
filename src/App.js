@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import NewMessage from "./components/NewMessage";
+import SingleMessageItem from "./components/SingleMessageItem";
 
 function App() {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}>
           <Route path="message" element={<NewMessage />} />
-          {/* <Route path="messagelist" element={<MessagesList />} />                    */}
+          <Route path="messages-list" element={<MessagesList />} />
+          <Route path="message-item" element={<SingleMessageItem />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

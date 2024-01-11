@@ -22,6 +22,9 @@ const UserSlice = createSlice({
       googleLogout();
       state.token = null;
     },
+    setMessagesContent: (state, action) => {
+      state.messagesContent = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(UserProfile.pending, (state, action) => {
@@ -74,6 +77,7 @@ const UserSlice = createSlice({
 });
 export const {
   error,
+  setMessagesContent,
   loading,
   token,
   profile,
