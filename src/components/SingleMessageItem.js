@@ -5,7 +5,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const SingleMessageItem = () => {
   const navigate = useNavigate();
+  const [emailText, setEmailText] = useState("");
   const { profile, token } = useSelector((state) => state.user);
+  const [forwardMessageBox, setForwardMessageBox] = useState(false);
   const [htmlContent, setHtmlContent] = useState(null);
   const [plainContent, setPlainContent] = useState(null);
   const [attachmentId, setAttachmentId] = useState([]);
@@ -13,10 +15,12 @@ const SingleMessageItem = () => {
   const location = useLocation();
   const content = location.state.content;
   const btnStyle =
-    "w-fit text-black hover:bg-gray-300 px-4 py-2 rounded-md border-[2px]";
+    "w-fit text-black hover:bg-gray-300 px-6 py-1 rounded-md border-[2px]";
   useEffect(() => {
     const expandComponent = () => {
-      if (content.payload.mimeType === "multipart/mixed") {
+      if (content.payload.body.size > 0) {
+        setHtmlContent(content.payload);
+      } else if (content.payload.mimeType === "multipart/mixed") {
         console.log("mixed data: ", content.payload.parts);
         setPlainContent(content.payload.parts[0].parts[0]);
         setHtmlContent(content.payload.parts[0].parts[1]);
@@ -31,6 +35,58 @@ const SingleMessageItem = () => {
     };
     expandComponent();
   }, [content]);
+
+  const handleForward = () => {
+    setForwardMessageBox(true);
+  };
+  const handleChange = (e) => {
+    setEmailText(e.target.value);
+  };
+  const handleDiscard = () => {
+    setForwardMessageBox(false);
+  };
+  const forwardMessage = async (event) => {
+    event.preventDefault();
+    setEmailText("");
+    try {
+      const userId = profile.email;
+      const accessToken = token;
+
+      const apiUrl = `https://gmail.googleapis.com/gmail/v1/users/${userId}/messages/send`;
+
+      const subject = `Fwd: ${
+        content &&
+        content.payload.headers.filter((item) => item.name === "Subject")[0]
+          .value
+      }`;
+      const message = "this is message content ";
+      const recipient = { emailText };
+      const originalMessageId = content.id;
+
+      const emailContent = `To: ${emailText}\r\nSubject: ${subject} \r\nIn-Reply-To: ${originalMessageId}\r\nFrom: ${profile.email} \r\n${htmlContent}
+      `;
+
+      const base64EncodedEmail = btoa(
+        unescape(encodeURIComponent(emailContent))
+      );
+
+      const emailData = {
+        raw: base64EncodedEmail,
+      };
+
+      const response = await axios.post(apiUrl, emailData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Email forwarded successfully:", response.data);
+    } catch (error) {
+      console.error("Error forwarding email:", error.response || error);
+    }
+  };
+
   // const getAttachment = () => {
   //   axios
   //     .get(
@@ -51,12 +107,7 @@ const SingleMessageItem = () => {
   //     );
   return (
     <>
-      <div className="w-[80%] bg-white flex flex-col gap-4 border-black border-[1px] rounded-md">
-        {/*{plainContent && (*/}
-        {/*  <code className="w-[60%] p-4 font-normal text-black">*/}
-        {/*    {atob(plainContent.body.data.replace(/-/g, "+").replace(/_/g, "/"))}*/}
-        {/*  </code>*/}
-        {/*)}*/}
+      <div className="w-full bg-white flex flex-col gap-4 border-black border-[1px] rounded-md">
         {htmlContent && (
           <div className="flex flex-col gap-4 p-4 ">
             <div className="flex gap-4 items-center">
@@ -64,11 +115,12 @@ const SingleMessageItem = () => {
                 back
               </button>
               <div className="text-black">
-                <span className="font-extrabold">Subject: </span>
+                <span className="font-extrabold mr-4">Subject: </span>
                 {content &&
                   content.payload.headers.filter(
-                    (item) => item.name === "Subject",
+                    (item) => item.name === "Subject"
                   )[0].value}
+                {content && console.log("content object: ", content)}
               </div>
             </div>
 
@@ -76,14 +128,39 @@ const SingleMessageItem = () => {
               className=""
               dangerouslySetInnerHTML={{
                 __html: atob(
-                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
+                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
                 ),
               }}
             />
             <div className="flex gap-4 mt-4">
               <button className={btnStyle}>Reply</button>
-              <button className={btnStyle}>Forward</button>
+              <button className={btnStyle} onClick={handleForward}>
+                Forward
+              </button>
             </div>
+            {forwardMessageBox && (
+              <div className="flex flex-col gap-4 mt-4 p-4 border-[1px] border-gray-400 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <label className="font-medium">Forwarding To</label>
+                  <button className={btnStyle} onClick={handleDiscard}>
+                    Discard
+                  </button>
+                </div>
+                <form
+                  className="flex justify-between items-center"
+                  onSubmit={forwardMessage}
+                >
+                  <input
+                    value={emailText}
+                    onChange={handleChange}
+                    type="email"
+                    placeholder="Email"
+                    className="p-3 outline-none border-[1px] border-gray-300 min-w-[40%] rounded-lg"
+                  />
+                  <button className={btnStyle}>Forward Message</button>
+                </form>
+              </div>
+            )}
           </div>
         )}
       </div>

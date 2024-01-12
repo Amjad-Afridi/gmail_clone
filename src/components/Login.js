@@ -16,11 +16,13 @@ const Login = () => {
     },
     onError: (error) => console.log("Login Failed:", error),
     scope: "https://www.googleapis.com/auth/gmail.readonly",
+    scope: "https://www.googleapis.com/auth/gmail.send",
+    scope: "https://www.googleapis.com/auth/gmail.compose",
   });
 
   return (
-    <div className="flex flex-col gap-4 m-auto">
-      <div className="font-medium"> Login with google</div>
+    <div className="flex flex-col w-fit gap-4 mx-auto justify-center items-center mt-56 border-gray-300 border-2 p-8 rounded-lg">
+      <div className="font-medium"> Login to your Gmail</div>
       <button
         className="p-4 bg-blue-900 rounded-lg text-white font-medium w-fit"
         onClick={() => login()}

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { MessageContent } from "../Redux/Thunks/MessageContent";
 import SingleMessageItem from "./SingleMessageItem";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setMessagesContent } from "../Redux/Slices/UserSlice";
 const MessagesList = () => {
@@ -28,10 +28,10 @@ const MessagesList = () => {
               params: {
                 format: "full",
               },
-            },
+            }
           );
           return response.data;
-        }),
+        })
       );
       dispatch(setMessagesContent(result));
       console.log(" messages content is : ", result);
@@ -41,7 +41,7 @@ const MessagesList = () => {
 
   return (
     <>
-      <div className="w-[80%]">
+      <div className="w-full">
         {messagesContent.length !== 0 ? (
           messagesContent.map((message, index) => (
             <MessageItem key={index} content={message} />
@@ -49,12 +49,6 @@ const MessagesList = () => {
         ) : (
           <p> Loading Messages</p>
         )}
-        {/*{error && <p>{error.message}</p>}*/}
-
-        {/*{selectedItemIndex !== null && (*/}
-        {/*  <SingleMessageItem content={messagesContent[selectedItemIndex]} />*/}
-        {/*)}*/}
-        {/*{loading && <p>loading messages</p>}*/}
       </div>
     </>
   );

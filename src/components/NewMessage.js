@@ -1,6 +1,9 @@
+import axios from "axios";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 function NewMessage() {
+  const { token, profile } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [recipients, setRecipients] = useState("");
   const [subject, setSubject] = useState("");
@@ -8,8 +11,43 @@ function NewMessage() {
   const [showMessage, setShowMessage] = useState(true);
   const commonFormsStyles = "border-b-[1px] pb-2 outline-none ";
 
-  const submitForm = (event) => {
+  const submitForm = async (event) => {
     event.preventDefault();
+    console.log(" token is: ", token);
+    console.log(" profile: ", profile);
+
+    try {
+      const userId = profile.email; // Replace with the actual user ID
+      const accessToken = token; // Replace with the actual access token
+
+      const apiUrl = `https://gmail.googleapis.com/gmail/v1/users/${userId}/messages/send`;
+
+      const emailContent = `To: ${recipients}\r\nSubject: ${subject}\r\n\r\n${textarea}
+      `;
+
+      // Encoding the email content in base64
+      const base64EncodedEmail = btoa(
+        unescape(encodeURIComponent(emailContent))
+      );
+
+      const emailData = {
+        raw: base64EncodedEmail,
+      };
+
+      const response = await axios.post(apiUrl, emailData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Email sent successfully:", response.data);
+      alert("Email sent successfully");
+    } catch (error) {
+      console.error("Error sending email:", error.response || error);
+    }
+
+    // console.log("result after sending email ", response);
     setRecipients("");
     setTextarea("");
     setSubject("");
@@ -29,9 +67,7 @@ function NewMessage() {
   const handleSubjectChange = (e) => {
     setSubject(e.target.value);
   };
-  const handleFocus = (e) => {
-    setRecipients("To:  ");
-  };
+
   return (
     <>
       {showMessage && (
@@ -43,11 +79,10 @@ function NewMessage() {
           <form onSubmit={submitForm} className="flex flex-col gap-3 p-4">
             <input
               required
-              type="text"
+              type="email"
               className={commonFormsStyles}
-              placeholder="Recipients"
+              placeholder="Recipient"
               value={recipients}
-              onFocus={handleFocus}
               onChange={handleRecipientsChange}
             />
             <input

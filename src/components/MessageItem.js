@@ -8,14 +8,12 @@ const MessageItem = ({ content }) => {
   const navigate = useNavigate();
   const { profile, token } = useSelector((state) => state.user);
   const handleClick = () => {
-    console.log("item clicked");
     navigate("/message-item", { state: { content } });
   };
   return (
     <>
-      <br />
       <div
-        className=" flex w-full p-2 border-b-[1px] border-black"
+        className="flex w-full p-2 border-b-[1px] border-gray-400 hover:shadow-lg hover:rounded-full "
         onClick={handleClick}
       >
         {content.snippet !== ""
@@ -23,6 +21,7 @@ const MessageItem = ({ content }) => {
           : content.payload.headers.filter((item) => item.name === "From")[0]
               .value}
       </div>
+      <br />
     </>
   );
 };

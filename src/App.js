@@ -21,13 +21,13 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />}>
-          <Route path="message" element={<NewMessage />} />
           <Route path="messages-list" element={<MessagesList />} />
+          <Route path="message" element={<NewMessage />} />
           <Route path="message-item" element={<SingleMessageItem />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
-      <br /> <br />
+      <br />
       {}
     </>
   );
