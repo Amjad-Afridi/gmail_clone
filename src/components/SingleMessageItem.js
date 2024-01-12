@@ -59,15 +59,12 @@ const SingleMessageItem = () => {
         content.payload.headers.filter((item) => item.name === "Subject")[0]
           .value
       }`;
-      const message = "this is message content ";
-      const recipient = { emailText };
-      const originalMessageId = content.id;
 
-      const emailContent = `To: ${emailText}\r\nSubject: ${subject} \r\nIn-Reply-To: ${originalMessageId}\r\nFrom: ${profile.email} \r\n${htmlContent}
+      const emailContent = `To: ${emailText}\r\nSubject: ${subject} \r\nIn-Reply-To: ${content.id}\r\nFrom: ${profile.email} \r\n${htmlContent}
       `;
 
       const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(emailContent))
+        unescape(encodeURIComponent(emailContent)),
       );
 
       const emailData = {
@@ -82,6 +79,8 @@ const SingleMessageItem = () => {
       });
 
       console.log("Email forwarded successfully:", response.data);
+      alert("message forwarded");
+      setForwardMessageBox(false);
     } catch (error) {
       console.error("Error forwarding email:", error.response || error);
     }
@@ -118,7 +117,7 @@ const SingleMessageItem = () => {
                 <span className="font-extrabold mr-4">Subject: </span>
                 {content &&
                   content.payload.headers.filter(
-                    (item) => item.name === "Subject"
+                    (item) => item.name === "Subject",
                   )[0].value}
                 {content && console.log("content object: ", content)}
               </div>
@@ -128,7 +127,7 @@ const SingleMessageItem = () => {
               className=""
               dangerouslySetInnerHTML={{
                 __html: atob(
-                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
+                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
                 ),
               }}
             />

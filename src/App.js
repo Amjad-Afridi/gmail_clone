@@ -22,6 +22,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}>
           <Route path="messages-list" element={<MessagesList />} />
+          <Route path="unread-messages-list" element={<MessagesList />} />
+          <Route path="sent-messages-list" element={<MessagesList />} />
           <Route path="message" element={<NewMessage />} />
           <Route path="message-item" element={<SingleMessageItem />} />
         </Route>

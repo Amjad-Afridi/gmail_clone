@@ -20,7 +20,8 @@ const Home = () => {
 
   useEffect(() => {
     const searchMessages = () => {
-      dispatch(MessageList({ profile, token }));
+      const query = "is:inbox";
+      dispatch(MessageList({ profile, token, query }));
     };
     searchMessages();
     navigate("/messages-list");

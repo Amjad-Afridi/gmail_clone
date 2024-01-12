@@ -7,8 +7,12 @@ import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
+import { MessageList } from "../Redux/Thunks/MessageList";
+import { useSelector, useDispatch } from "react-redux";
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
+  const { profile, token } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const items = [
     {
@@ -18,30 +22,34 @@ const Sidebar = () => {
     },
     {
       id: 2,
-      title: "Starred",
-      icon: <FaRegStar size={20} />,
-    },
-    {
-      id: 3,
-      title: "Snoozed",
-      icon: <MdAccessAlarm size={22} />,
-    },
-    {
-      id: 4,
       title: "Sent",
       icon: <IoMdSend size={20} />,
     },
     {
-      id: 5,
-      title: "Drafts",
+      id: 3,
+      title: "Unread",
       icon: <RiDraftLine size={20} />,
     },
-    {
-      id: 6,
-      title: "More",
-      icon: <MdExpandMore size={25} />,
-    },
   ];
+  const handleInbox = () => {
+    console.log("inbox clicked");
+    const query = "is:inbox";
+    dispatch(MessageList({ profile, token, query }));
+    navigate("/messages-list");
+  };
+  const handleSentMessages = () => {
+    console.log("sent clicked");
+    const query = "is:sent";
+    dispatch(MessageList({ profile, token, query }));
+    navigate("/sent-messages-list");
+  };
+  const handleUnreadMessages = () => {
+    console.log("unread clicked");
+    const query = "is:unread";
+    dispatch(MessageList({ profile, token, query }));
+    navigate("/unread-messages-list");
+  };
+
   return (
     <div className="w-1/6">
       <button
@@ -54,11 +62,16 @@ const Sidebar = () => {
       <div className="flex flex-col ">
         {items.map((item) => {
           return (
-            <div className="flex items-center justify-start gap-4 px-4 py-2 rounded-r-full hover:bg-gray-300">
+            <div className="flex items-center justify-start gap-4 px-4 py-2 rounded-r-full hover:bg-gray-300 active:bg-gray-300 ">
               <div>{item.icon}</div>
               <div
                 className="text-black font-normal"
-                // onClick={() => navigate("/messagelist")}
+                onClick={() =>
+                  (item.id === 1 && handleInbox()) ||
+                  (item.id === 2 && handleSentMessages()) ||
+                  (item.id === 3 && handleUnreadMessages())
+                }
+                key={item.id}
               >
                 {item.title}
               </div>
