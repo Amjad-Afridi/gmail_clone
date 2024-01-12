@@ -5,10 +5,12 @@ import { IoMdSend } from "react-icons/io";
 import { RiDraftLine } from "react-icons/ri";
 import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
+import { AiOutlineLogout } from "react-icons/ai";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import { MessageList } from "../Redux/Thunks/MessageList";
 import { useSelector, useDispatch } from "react-redux";
+import { logoutInfo } from "../Redux/Slices/UserSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -30,6 +32,11 @@ const Sidebar = () => {
       title: "Unread",
       icon: <RiDraftLine size={20} />,
     },
+    {
+      id: 4,
+      title: "Logout",
+      icon: <AiOutlineLogout />,
+    },
   ];
   const handleInbox = () => {
     console.log("inbox clicked");
@@ -49,7 +56,11 @@ const Sidebar = () => {
     dispatch(MessageList({ profile, token, query }));
     navigate("/unread-messages-list");
   };
-
+  const handleLogout = () => {
+    console.log("logged out clicked");
+    dispatch(logoutInfo());
+    navigate("/login");
+  };
   return (
     <div className="w-1/6">
       <button
@@ -69,7 +80,8 @@ const Sidebar = () => {
                 onClick={() =>
                   (item.id === 1 && handleInbox()) ||
                   (item.id === 2 && handleSentMessages()) ||
-                  (item.id === 3 && handleUnreadMessages())
+                  (item.id === 3 && handleUnreadMessages()) ||
+                  (item.id === 4 && handleLogout())
                 }
                 key={item.id}
               >

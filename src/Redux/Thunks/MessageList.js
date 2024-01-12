@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const MessageList = createAsyncThunk(
   "user/messages",
-  async ({ profile, token, query }) => {
+  async ({ profile, token, query, nextToken = null }) => {
     const response = await axios.get(
       `https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages?q=${query}`,
       {
@@ -14,6 +14,7 @@ export const MessageList = createAsyncThunk(
         },
         params: {
           maxResults: 10,
+          pageToken: nextToken,
         },
       },
     );

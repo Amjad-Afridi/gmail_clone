@@ -11,6 +11,7 @@ const UserSlice = createSlice({
     profile: null,
     messageIds: [],
     messagesContent: [],
+    nextPageToken: [],
     loading: false,
     error: null,
   },
@@ -24,6 +25,12 @@ const UserSlice = createSlice({
     },
     setMessagesContent: (state, action) => {
       state.messagesContent = action.payload;
+    },
+    setPreviousToken: (state, action) => {
+      if (state.nextPageToken.length > 1) {
+        state.nextPageToken.splice(-2, 2);
+      } else {
+      }
     },
   },
   extraReducers: (builder) => {
@@ -44,6 +51,11 @@ const UserSlice = createSlice({
     builder.addCase(MessageList.fulfilled, (state, action) => {
       state.loading = false;
       state.messageIds = action.payload.messages;
+      console.log(
+        "messages list after successful call is: ",
+        action.payload.messages,
+      );
+      state.nextPageToken.push(action.payload.nextPageToken);
     });
     builder.addCase(MessageList.rejected, (state, action) => {
       state.loading = false;
@@ -83,6 +95,7 @@ export const {
   profile,
   messageIds,
   messagesContent,
+  setPreviousToken,
   loginInfo,
   logoutInfo,
 } = UserSlice.actions;
