@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import buffer from "buffer";
+
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,11 +11,10 @@ const SingleMessageItem = () => {
   const { profile, token } = useSelector((state) => state.user);
   const [forwardMessageBox, setForwardMessageBox] = useState(false);
   const [htmlContent, setHtmlContent] = useState(null);
-  const [plainContent, setPlainContent] = useState(null);
   const [attachmentId, setAttachmentId] = useState([]);
   const [files, setFiles] = useState(null);
   const location = useLocation();
-  const content = location.state.content;
+  const content = location.state.content || "no content";
   const btnStyle =
     "w-fit text-black hover:bg-gray-300 px-6 py-1 rounded-md border-[2px]";
   useEffect(() => {
@@ -22,15 +23,16 @@ const SingleMessageItem = () => {
         setHtmlContent(content.payload);
       } else if (content.payload.mimeType === "multipart/mixed") {
         console.log("mixed data: ", content.payload.parts);
-        setPlainContent(content.payload.parts[0].parts[0]);
+        // setPlainContent(content.payload.parts[0].parts[0]);
         setHtmlContent(content.payload.parts[0].parts[1]);
         setAttachmentId(content.payload.parts[1].body.attachmentId);
       }
       // if(content.payload.mimeType === "multipart/alternative")
       else {
-        console.log("alternative", content.payload.parts);
-        setPlainContent(content.payload.parts[0]);
+        console.log("mimetype is : ", content.payload.mimeType);
+        console.log("content is: ");
         setHtmlContent(content.payload.parts[1]);
+        // setPlainContent(content.payload.parts[0]);
       }
     };
     expandComponent();
@@ -60,8 +62,12 @@ const SingleMessageItem = () => {
           .value
       }`;
 
-      const emailContent = `To: ${emailText}\r\nSubject: ${subject} \r\nIn-Reply-To: ${content.id}\r\nFrom: ${profile.email} \r\n${htmlContent}
-      `;
+      // const emailContent = `To: ${emailText}\r\nSubject: ${subject}\r\nIn-Reply-To: ${content.id}\r\nFrom: ${profile.email}\r\nthis is the email content
+      // `;
+      // const base64EncodedEmail = btoa(
+      //   unescape(encodeURIComponent(emailContent)),
+      // );
+      const emailContent = `To: ${emailText}\r\nSubject: ${subject}\r\nIn-Reply-To: ${content.id}\r\nFrom: ${profile.email}\r\nthis is the email content\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: base64\r\n\r\n`;
 
       const base64EncodedEmail = btoa(
         unescape(encodeURIComponent(emailContent)),
@@ -79,6 +85,7 @@ const SingleMessageItem = () => {
       });
 
       console.log("Email forwarded successfully:", response.data);
+      console.log("raw data is : ", emailData.raw);
       alert("message forwarded");
       setForwardMessageBox(false);
     } catch (error) {

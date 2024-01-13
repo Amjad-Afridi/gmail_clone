@@ -18,6 +18,7 @@ const Login = () => {
     scope: "https://www.googleapis.com/auth/gmail.readonly",
     scope: "https://www.googleapis.com/auth/gmail.send",
     scope: "https://www.googleapis.com/auth/gmail.compose",
+    scope: "https://www.googleapis.com/auth/gmail.modify",
   });
 
   return (
