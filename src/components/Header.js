@@ -5,7 +5,9 @@ import { useSelector } from "react-redux";
 const Header = () => {
   const { profile, messagesIds } = useSelector((state) => state.user);
   const iconStyle = "p-2 rounded-full hover:bg-gray-400 hover:cursor-pointer";
-  const submitForm = () => {};
+  const submitForm = (event) => {
+    event.preventDefault();
+  };
   return (
     <>
       <div className="flex w-full p-4 items-center">

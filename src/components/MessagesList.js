@@ -43,10 +43,10 @@ const MessagesList = () => {
               params: {
                 format: "full",
               },
-            },
+            }
           );
           return response.data;
-        }),
+        })
       );
       dispatch(setMessagesContent(result));
     };
@@ -55,8 +55,6 @@ const MessagesList = () => {
   const handleNextList = async () => {
     var query;
     const nextToken = nextPageToken[nextPageToken.length - 1];
-    console.log(nextPageToken);
-    console.log(location.pathname);
     if (location.pathname === "/unread-messages-list") {
       query = "is:unread";
     } else if (location.pathname === "/sent-messages-list") {
@@ -64,17 +62,12 @@ const MessagesList = () => {
     } else {
       query = "is:inbox";
     }
-    const result = await dispatch(
-      MessageList({ profile, token, query, nextToken }),
-    );
-    console.log("result is : ", result);
+    dispatch(MessageList({ profile, token, query, nextToken }));
   };
   const handlePreviousList = async () => {
-    await dispatch(setPreviousToken());
     var query;
-    const nextToken = nextPageToken[nextPageToken.length - 3];
-    console.log("prev token is: ", nextPageToken);
-    console.log(location.pathname);
+    if (nextPageToken.length === 0 || nextPageToken.length === 1) return;
+    dispatch(setPreviousToken());
     if (location.pathname === "/unread-messages-list") {
       query = "is:unread";
     } else if (location.pathname === "/sent-messages-list") {
@@ -82,10 +75,13 @@ const MessagesList = () => {
     } else {
       query = "is:inbox";
     }
-    const result = await dispatch(
-      MessageList({ profile, token, query, nextToken }),
-    );
-    console.log("prev result is : ", result);
+
+    if (nextPageToken.length == 2) {
+      dispatch(MessageList({ profile, token, query }));
+    } else {
+      const nextToken = nextPageToken[nextPageToken.length - 3];
+      dispatch(MessageList({ profile, token, query, nextToken }));
+    }
   };
   return (
     <>
@@ -94,7 +90,10 @@ const MessagesList = () => {
         <div className="flex justify-end items-baseline gap-4 ">
           <GrFormPrevious
             size={28}
-            className={iconStyle}
+            className={`${iconStyle} + ${
+              nextPageToken.length === 1 &&
+              " cursor-not-allowed hover:bg-inherit"
+            }`}
             onClick={handlePreviousList}
           />
           <MdNavigateNext
@@ -106,16 +105,14 @@ const MessagesList = () => {
       </div>
 
       <div className="w-full">
-        {!loading ? (
-          messagesContent.length === 0 ? (
-            <p> List is Empty</p>
-          ) : (
-            messagesContent.map((message, index) => (
-              <MessageItem key={index} content={message} />
-            ))
-          )
-        ) : (
+        {loading ? (
           <p> Loading Messages</p>
+        ) : messagesContent.length === 0 ? (
+          <p> No messages available</p>
+        ) : (
+          messagesContent.map((message, index) => (
+            <MessageItem key={index} content={message} />
+          ))
         )}
       </div>
     </>

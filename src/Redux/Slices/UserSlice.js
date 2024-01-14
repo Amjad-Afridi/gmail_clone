@@ -27,9 +27,9 @@ const UserSlice = createSlice({
       state.messagesContent = action.payload;
     },
     setPreviousToken: (state, action) => {
+      console.log("Previous token dispatched: ", state.nextPageToken);
       if (state.nextPageToken.length > 1) {
         state.nextPageToken.splice(-2, 2);
-      } else {
       }
     },
   },
@@ -51,10 +51,6 @@ const UserSlice = createSlice({
     builder.addCase(MessageList.fulfilled, (state, action) => {
       state.loading = false;
       state.messageIds = action.payload.messages;
-      console.log(
-        "messages list after successful call is: ",
-        action.payload.messages,
-      );
       state.nextPageToken.push(action.payload.nextPageToken);
     });
     builder.addCase(MessageList.rejected, (state, action) => {
@@ -67,19 +63,7 @@ const UserSlice = createSlice({
     });
     builder.addCase(MessageContent.fulfilled, (state, action) => {
       state.loading = false;
-      // console.log("text content", action.payload.payload.parts[0]);
-      // state.messagesContent.plainContent = action.payload.payload.parts[0];
-      // console.log("html content", action.payload.payload.parts[1]);
-      // state.messagesContent.htmlContent = action.payload.payload.parts[1];
       state.messagesContent.push(action.payload);
-      // state.messagesContent = action.payload;
-      // action.payload.payload.parts.forEach((part) => {
-      //   if (part.mimeType === "text/html" || part.mimeType === "text/plain") {
-      //     const bodyContent = part.body.data;
-      //     const safeContent = bodyContent.replace(/-/g, "+").replace(/_/g, "/");
-      //     state.messagesContent.push(atob(safeContent));
-      //   }
-      // });
     });
     builder.addCase(MessageContent.rejected, (state, action) => {
       state.loading = false;

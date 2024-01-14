@@ -7,7 +7,7 @@ import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { HiOutlinePencil } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MessageList } from "../Redux/Thunks/MessageList";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutInfo } from "../Redux/Slices/UserSlice";
@@ -16,6 +16,7 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const { profile, token } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const location = useLocation();
   const items = [
     {
       id: 1,
@@ -39,25 +40,21 @@ const Sidebar = () => {
     },
   ];
   const handleInbox = () => {
-    console.log("inbox clicked");
     const query = "is:inbox";
     dispatch(MessageList({ profile, token, query }));
     navigate("/messages-list");
   };
   const handleSentMessages = () => {
-    console.log("sent clicked");
     const query = "is:sent";
     dispatch(MessageList({ profile, token, query }));
     navigate("/sent-messages-list");
   };
   const handleUnreadMessages = () => {
-    console.log("unread clicked");
     const query = "is:unread";
     dispatch(MessageList({ profile, token, query }));
     navigate("/unread-messages-list");
   };
   const handleLogout = () => {
-    console.log("logged out clicked");
     dispatch(logoutInfo());
     navigate("/login");
   };
