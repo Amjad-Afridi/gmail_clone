@@ -71,7 +71,7 @@ const SingleMessageItem = () => {
   useEffect(() => {
     const fetchAttachments = async (attachments) => {
       try {
-        setAttachmentsLoading(true);
+        attachments.length > 0 && setAttachmentsLoading(true);
         const responses = await Promise.all(
           attachments.map(async (attachment) => {
             const response = await axios.get(
@@ -193,7 +193,7 @@ const SingleMessageItem = () => {
         },
       });
       console.log("raw data is : ", base64EncodedEmail);
-      alert("successfully replied with: ", response);
+      alert("successfully replied ", response);
       setReplyMessageBox(false);
     } catch (error) {
       console.log(" error while replying: ", error.message);
@@ -298,7 +298,7 @@ const SingleMessageItem = () => {
                 </div>
               )
             ) : (
-              <p> loading attachments</p>
+              <p>loading attachments </p>
             )}
             <div className="flex gap-4 mt-8">
               <button className={btnStyle} onClick={handleReply}>
