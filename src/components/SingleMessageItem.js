@@ -29,19 +29,19 @@ const SingleMessageItem = () => {
         setAttachments(
           content.payload.parts &&
             content.payload.parts.filter(
-              (part) => part.filename && part.body.attachmentId
-            )
+              (part) => part.filename && part.body.attachmentId,
+            ),
         );
         console.log("attachments are: ", attachments);
         if (content.payload.parts.parts) {
           console.log(
             " when parts parts is true ",
-            content.payload.parts.parts[0]
+            content.payload.parts.parts[0],
           );
           setHtmlContent(
             content.payload.parts.parts[0].find(
-              (part) => part.mimeType === "text/html"
-            )
+              (part) => part.mimeType === "text/html",
+            ),
           );
         } else {
           if (content.payload.parts[0].body.size > 0) {
@@ -49,8 +49,8 @@ const SingleMessageItem = () => {
           } else {
             setHtmlContent(
               content.payload.parts[0].parts.find(
-                (part) => part.mimeType === "text/html"
-              )
+                (part) => part.mimeType === "text/html",
+              ),
             );
           }
         }
@@ -61,7 +61,7 @@ const SingleMessageItem = () => {
         console.log("content is: ", content);
         content.payload.parts &&
           setHtmlContent(
-            content.payload.parts.find((part) => part.mimeType === "text/html")
+            content.payload.parts.find((part) => part.mimeType === "text/html"),
           );
       }
     };
@@ -82,10 +82,10 @@ const SingleMessageItem = () => {
                 params: {
                   format: "full",
                 },
-              }
+              },
             );
             return response;
-          })
+          }),
         );
         console.log("attachment responses are : ", responses);
         setAttachmentResponses(responses);
@@ -130,10 +130,10 @@ const SingleMessageItem = () => {
       const emailContent = `To: ${emailText}\r\nSubject: ${subject}\r\nIn-Reply-To: ${
         content.id
       }\r\nFrom: ${profile.email}\r\nMIME-Version: 1.0\r\n\r\n${atob(
-        htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
+        htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
       )}`;
       const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(emailContent))
+        unescape(encodeURIComponent(emailContent)),
       );
 
       const emailData = {
@@ -166,16 +166,16 @@ const SingleMessageItem = () => {
         content.payload.headers.find((item) => item.name === "Subject").value
       }`;
       const replyTo = content.payload.headers.find(
-        (header) => header.name === "From"
+        (header) => header.name === "From",
       ).value;
       const messageId = content.payload.headers.find(
-        (header) => header.name === "Message-Id"
+        (header) => header.name === "Message-Id",
       ).value;
 
       const replyMessage = `To: ${replyTo}\r\nSubject: ${subject}\r\nReferences: ${messageId}\r\nIn-Reply-To: ${messageId}\r\n\r\n${replyText}`;
 
       const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(replyMessage))
+        unescape(encodeURIComponent(replyMessage)),
       );
 
       const emailData = {
@@ -200,37 +200,6 @@ const SingleMessageItem = () => {
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");
   };
-  // const decodeBase64 = (base64String) => {
-  //   // Add padding if needed
-  //   const paddedBase64String =
-  //     base64String + "=".repeat(4 - (base64String.length % 4));
-
-  //   try {
-  //     // Convert the properly padded base64 string to binary data
-  //     const binaryString = atob(paddedBase64String);
-
-  //     // Create an array to hold the byte values
-  //     const byteNumbers = new Array(binaryString.length);
-  //     for (let i = 0; i < binaryString.length; i++) {
-  //       byteNumbers[i] = binaryString.charCodeAt(i);
-  //     }
-
-  //     // Create a Uint8Array from the byte values
-  //     const byteArray = new Uint8Array(byteNumbers);
-
-  //     // Check if byteArray is not empty
-  //     if (byteArray.length === 0) {
-  //       console.error("Error: Byte array is empty");
-  //       return null;
-  //     }
-
-  //     // Create a Blob from the Uint8Array
-  //     return new Blob([byteArray], { type: "application/octet-stream" });
-  //   } catch (error) {
-  //     console.error("Error decoding base64:", error);
-  //     return null; // Return null or handle the error accordingly
-  //   }
-  // };
 
   return (
     <>
@@ -245,7 +214,7 @@ const SingleMessageItem = () => {
                 <span className="font-extrabold mr-4">Subject: </span>
                 {content &&
                   content.payload.headers.filter(
-                    (item) => item.name === "Subject"
+                    (item) => item.name === "Subject",
                   )[0].value}
                 {content && console.log("content object: ", content)}
               </div>
@@ -255,7 +224,7 @@ const SingleMessageItem = () => {
               className=""
               dangerouslySetInnerHTML={{
                 __html: atob(
-                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
+                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
                 ),
               }}
             />
@@ -272,26 +241,59 @@ const SingleMessageItem = () => {
                 {attachmentResponses.map((attachmentResponse, index) => {
                   const attachment = content.payload.parts[index];
                   const encodedData = attachmentResponse.data.data; // Assuming encoded data
-                  const decodedData = atob(encodedData.trim()); // Decode the data
-                  const blob = new Blob([decodedData], {
-                    type: attachment.mimeType,
-                  });
-                  const fileUrl = URL.createObjectURL(blob);
+                  const decodedData = atob(
+                    encodedData.replace(/-/g, "+").replace(/_/g, "/"),
+                  );
+                  let url;
+                  try {
+                    const byteNumbers = new Array(decodedData.length);
+                    for (let i = 0; i < decodedData.length; i++) {
+                      byteNumbers[i] = decodedData.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    if (byteArray.length === 0) {
+                      console.error("Error: Byte array is empty");
+                      return null;
+                    }
+                    const blob = new Blob([byteArray], {
+                      type: "application/octet-stream",
+                    });
+                    url = URL.createObjectURL(blob);
+                    console.log("url is: ", url);
+                  } catch (error) {
+                    console.error("Error decoding base64:", error);
+                    return null; // Return null or handle the error accordingly
+                  }
                   return (
                     <div key={index} className="p-4 border-2 rounded-md w-48">
-                      {
-                        <a
-                          href={fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <p>{attachment.filename}</p>
-                          <p>Size: {attachment.body.size} bytes</p>
-                          Download Attachment
-                        </a>
-                      }
-                      <p>Size: {attachment.body.size} bytes</p>
-                      Download Attachment
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className=" flex flex-col gap-4"
+                      >
+                        <p>{attachment.filename}</p>
+                        {attachment.mimeType &&
+                          attachment.mimeType.startsWith("image/") && (
+                            <img
+                              src={url}
+                              alt={attachment.filename}
+                              style={{ maxWidth: "100% ", borderRadius: "8px" }}
+                            />
+                          )}
+                        {attachment.mimeType &&
+                          attachment.mimeType === "application/pdf" && (
+                            <iframe
+                              title={attachment.filename}
+                              src={url}
+                              width="100%"
+                              height="400px"
+                              style={{ border: "none" }}
+                            />
+                          )}
+                        {/* Add more conditions for other file types as needed */}
+                        Download item
+                      </a>
                     </div>
                   );
                 })}
