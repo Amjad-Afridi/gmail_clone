@@ -17,6 +17,7 @@ const SingleMessageItem = () => {
   const content = location.state.content;
   const [attachmentResponses, setAttachmentResponses] = useState([]);
   const [attachments, setAttachments] = useState(null);
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false);
   const btnStyle =
     "w-fit text-black hover:bg-gray-300 px-6 py-1 rounded-md border-[2px]";
   useEffect(() => {
@@ -70,6 +71,7 @@ const SingleMessageItem = () => {
   useEffect(() => {
     const fetchAttachments = async (attachments) => {
       try {
+        setAttachmentsLoading(true);
         const responses = await Promise.all(
           attachments.map(async (attachment) => {
             const response = await axios.get(
@@ -87,7 +89,8 @@ const SingleMessageItem = () => {
             return response;
           }),
         );
-        console.log("attachment responses are : ", responses);
+        setAttachmentsLoading(false);
+        console.log("attachment responses are: ", responses);
         setAttachmentResponses(responses);
       } catch (error) {
         console.log(error.message);
@@ -228,7 +231,76 @@ const SingleMessageItem = () => {
                 ),
               }}
             />
-            <div className="flex gap-4 mt-4">
+            {!attachmentsLoading ? (
+              attachmentResponses.length > 0 && (
+                <div className="flex gap-8 flex-wrap mt-8">
+                  {attachmentResponses.map((attachmentResponse, index) => {
+                    const attachment = content.payload.parts[index + 1];
+                    console.log("attachment is : ", attachment);
+                    const encodedData = attachmentResponse.data.data; // Assuming encoded data
+                    const decodedData = atob(
+                      encodedData.replace(/-/g, "+").replace(/_/g, "/"),
+                    );
+                    let url;
+                    try {
+                      const byteNumbers = new Array(decodedData.length);
+                      for (let i = 0; i < decodedData.length; i++) {
+                        byteNumbers[i] = decodedData.charCodeAt(i);
+                      }
+                      const byteArray = new Uint8Array(byteNumbers);
+                      if (byteArray.length === 0) {
+                        console.error("Error: Byte array is empty");
+                        return null;
+                      }
+                      const blob = new Blob([byteArray], {
+                        type: "application/octet-stream",
+                      });
+                      url = URL.createObjectURL(blob);
+                      console.log("url: ", url);
+                    } catch (error) {
+                      console.error("Error decoding base64:", error);
+                      return null; // Return null or handle the error accordingly
+                    }
+                    return (
+                      <div key={index} className="p-4 border-2 rounded-md w-48">
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className=" flex flex-col gap-4"
+                        >
+                          <p>{attachment.filename}</p>
+                          {attachment.mimeType &&
+                            attachment.mimeType.startsWith("image/") && (
+                              <img
+                                src={url}
+                                alt={attachment.filename}
+                                style={{
+                                  maxWidth: "100% ",
+                                  borderRadius: "8px",
+                                }}
+                              />
+                            )}
+                          {attachment.mimeType &&
+                            attachment.mimeType === "application/pdf" && (
+                              <embed
+                                src={url}
+                                type="application/pdf"
+                                width="100%"
+                              />
+                            )}
+                          {/* Add more conditions for other file types as needed */}
+                          Download item
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            ) : (
+              <p> loading attachments</p>
+            )}
+            <div className="flex gap-4 mt-8">
               <button className={btnStyle} onClick={handleReply}>
                 Reply
               </button>
@@ -236,69 +308,6 @@ const SingleMessageItem = () => {
                 Forward
               </button>
             </div>
-            {attachmentResponses.length > 0 && (
-              <div className="flex gap-8 flex-wrap">
-                {attachmentResponses.map((attachmentResponse, index) => {
-                  const attachment = content.payload.parts[index];
-                  const encodedData = attachmentResponse.data.data; // Assuming encoded data
-                  const decodedData = atob(
-                    encodedData.replace(/-/g, "+").replace(/_/g, "/"),
-                  );
-                  let url;
-                  try {
-                    const byteNumbers = new Array(decodedData.length);
-                    for (let i = 0; i < decodedData.length; i++) {
-                      byteNumbers[i] = decodedData.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    if (byteArray.length === 0) {
-                      console.error("Error: Byte array is empty");
-                      return null;
-                    }
-                    const blob = new Blob([byteArray], {
-                      type: "application/octet-stream",
-                    });
-                    url = URL.createObjectURL(blob);
-                    console.log("url is: ", url);
-                  } catch (error) {
-                    console.error("Error decoding base64:", error);
-                    return null; // Return null or handle the error accordingly
-                  }
-                  return (
-                    <div key={index} className="p-4 border-2 rounded-md w-48">
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className=" flex flex-col gap-4"
-                      >
-                        <p>{attachment.filename}</p>
-                        {attachment.mimeType &&
-                          attachment.mimeType.startsWith("image/") && (
-                            <img
-                              src={url}
-                              alt={attachment.filename}
-                              style={{ maxWidth: "100% ", borderRadius: "8px" }}
-                            />
-                          )}
-                        {attachment.mimeType &&
-                          attachment.mimeType === "application/pdf" && (
-                            <iframe
-                              title={attachment.filename}
-                              src={url}
-                              width="100%"
-                              height="400px"
-                              style={{ border: "none" }}
-                            />
-                          )}
-                        {/* Add more conditions for other file types as needed */}
-                        Download item
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
             {forwardMessageBox && (
               <div className="flex flex-col gap-4 mt-4 p-4 border-[1px] border-gray-400 rounded-lg">
                 <div className="flex justify-between items-center">
