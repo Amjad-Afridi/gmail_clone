@@ -14,7 +14,8 @@ import { MdNavigateNext } from "react-icons/md";
 import { GrFormPrevious } from "react-icons/gr";
 const MessagesList = () => {
   const location = useLocation();
-  const iconStyle = "hover:bg-gray-400 font-bold w-fit rounded-full";
+  const iconStyle =
+    "hover:bg-gray-400 font-bold w-fit rounded-full hover:cursor-pointer";
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
@@ -127,7 +128,10 @@ const MessagesList = () => {
 
       <div className="w-full">
         {loading ? (
-          <p> Loading Messages</p>
+          <p className="bg-gray-300 p-4 rounded-lg w-fit shadow-md">
+            {" "}
+            Loading Messages....!
+          </p>
         ) : messagesContent.length === 0 ? (
           <p> No messages available</p>
         ) : (

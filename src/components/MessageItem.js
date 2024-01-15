@@ -13,13 +13,30 @@ const MessageItem = ({ content }) => {
   return (
     <>
       <div
-        className="flex w-full p-2 border-b-[1px] border-gray-400 hover:shadow-lg hover:rounded-full "
+        className="flex w-full p-2 border-b-[1px] border-l-[1px] border-gray-400 hover:shadow-lg rounded-md hover:rounded-full hover:cursor-pointer"
         onClick={handleClick}
       >
-        {content.snippet !== ""
-          ? content.snippet
-          : content.payload.headers.filter((item) => item.name === "From")[0]
-              .value}
+        {content.payload.headers.find((item) => item.name === "Subject")
+          .value ? (
+          <div className="flex flex-row w-full">
+            <span className="min-w-[25%]">
+              {
+                content.payload.headers
+                  .find((item) => item.name === "From")
+                  .value.split(" ")[0]
+              }
+            </span>
+            <p>
+              {
+                content.payload.headers.find((item) => item.name === "Subject")
+                  .value
+              }
+            </p>
+          </div>
+        ) : (
+          "From:  " +
+          content.payload.headers.find((item) => item.name === "From").value
+        )}
       </div>
       <br />
     </>

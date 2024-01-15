@@ -70,7 +70,7 @@ const Sidebar = () => {
       <div className="flex flex-col ">
         {items.map((item) => {
           return (
-            <div className="flex items-center justify-start gap-4 px-4 py-2 rounded-r-full hover:bg-gray-300 active:bg-gray-300 ">
+            <div className="flex items-center justify-start gap-4 px-4 py-2 rounded-r-full hover:bg-gray-300 active:bg-gray-300 hover:cursor-pointer hover:shadow-lg">
               <div>{item.icon}</div>
               <div
                 className="text-black font-normal"
