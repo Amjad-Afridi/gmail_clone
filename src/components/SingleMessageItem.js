@@ -14,15 +14,25 @@ const SingleMessageItem = () => {
   const [attachmentId, setAttachmentId] = useState([]);
   const [files, setFiles] = useState(null);
   const location = useLocation();
-  const content = location.state.content || "no content";
+  const content = location.state.content;
+  const [attachmentResponses, setAttachmentResponses] = useState([]);
+  const [attachments, setAttachments] = useState(null);
   const btnStyle =
     "w-fit text-black hover:bg-gray-300 px-6 py-1 rounded-md border-[2px]";
   useEffect(() => {
     const expandComponent = () => {
+      console.log("item content is : ", content.payload);
       if (content.payload.body.size > 0) {
         setHtmlContent(content.payload);
       } else if (content.payload.mimeType === "multipart/mixed") {
         console.log("mixed data content is: ", content.payload.parts);
+        setAttachments(
+          content.payload.parts &&
+            content.payload.parts.filter(
+              (part) => part.filename && part.body.attachmentId
+            )
+        );
+        console.log("attachments are: ", attachments);
         if (content.payload.parts.parts) {
           console.log(
             " when parts parts is true ",
@@ -57,7 +67,34 @@ const SingleMessageItem = () => {
     };
     expandComponent();
   }, [content]);
-
+  useEffect(() => {
+    const fetchAttachments = async (attachments) => {
+      try {
+        const responses = await Promise.all(
+          attachments.map(async (attachment) => {
+            const response = await axios.get(
+              `https://gmail.googleapis.com/gmail/v1/users/me/messages/${profile.email}/attachments/${attachment.body.attachmentId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+                params: {
+                  format: "full",
+                },
+              }
+            );
+            return response;
+          })
+        );
+        console.log("attachment responses are : ", responses);
+        setAttachmentResponses(responses);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetchAttachments(attachments);
+  }, [attachments]);
   const handleForward = () => {
     setForwardMessageBox(true);
   };
@@ -159,25 +196,42 @@ const SingleMessageItem = () => {
       console.log(" error while replying: ", error.message);
     }
   };
+  const openAttachmentInNewTab = (blob) => {
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+  // const decodeBase64 = (base64String) => {
+  //   // Add padding if needed
+  //   const paddedBase64String =
+  //     base64String + "=".repeat(4 - (base64String.length % 4));
 
-  // const getAttachment = () => {
-  //   axios
-  //     .get(
-  //       `https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages/${content.id}/attachments/${attachmentId}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           Accept: "application/json",
-  //         },
-  //         params: {
-  //           format: "full",
-  //         },
-  //       },
-  //     )
-  //     .then(
-  //       (response) => setFiles(response.data.data),
-  //       // replace(/-/g, "+").replace(/_/g, "/")
-  //     );
+  //   try {
+  //     // Convert the properly padded base64 string to binary data
+  //     const binaryString = atob(paddedBase64String);
+
+  //     // Create an array to hold the byte values
+  //     const byteNumbers = new Array(binaryString.length);
+  //     for (let i = 0; i < binaryString.length; i++) {
+  //       byteNumbers[i] = binaryString.charCodeAt(i);
+  //     }
+
+  //     // Create a Uint8Array from the byte values
+  //     const byteArray = new Uint8Array(byteNumbers);
+
+  //     // Check if byteArray is not empty
+  //     if (byteArray.length === 0) {
+  //       console.error("Error: Byte array is empty");
+  //       return null;
+  //     }
+
+  //     // Create a Blob from the Uint8Array
+  //     return new Blob([byteArray], { type: "application/octet-stream" });
+  //   } catch (error) {
+  //     console.error("Error decoding base64:", error);
+  //     return null; // Return null or handle the error accordingly
+  //   }
+  // };
+
   return (
     <>
       <div className="w-full bg-white flex flex-col gap-4 border-black border-[1px] rounded-md">
@@ -213,6 +267,36 @@ const SingleMessageItem = () => {
                 Forward
               </button>
             </div>
+            {attachmentResponses.length > 0 && (
+              <div className="flex gap-8 flex-wrap">
+                {attachmentResponses.map((attachmentResponse, index) => {
+                  const attachment = content.payload.parts[index];
+                  const encodedData = attachmentResponse.data.data; // Assuming encoded data
+                  const decodedData = atob(encodedData.trim()); // Decode the data
+                  const blob = new Blob([decodedData], {
+                    type: attachment.mimeType,
+                  });
+                  const fileUrl = URL.createObjectURL(blob);
+                  return (
+                    <div key={index} className="p-4 border-2 rounded-md w-48">
+                      {
+                        <a
+                          href={fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <p>{attachment.filename}</p>
+                          <p>Size: {attachment.body.size} bytes</p>
+                          Download Attachment
+                        </a>
+                      }
+                      <p>Size: {attachment.body.size} bytes</p>
+                      Download Attachment
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             {forwardMessageBox && (
               <div className="flex flex-col gap-4 mt-4 p-4 border-[1px] border-gray-400 rounded-lg">
                 <div className="flex justify-between items-center">

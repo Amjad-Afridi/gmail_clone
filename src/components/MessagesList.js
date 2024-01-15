@@ -14,7 +14,6 @@ import { MdNavigateNext } from "react-icons/md";
 import { GrFormPrevious } from "react-icons/gr";
 const MessagesList = () => {
   const location = useLocation();
-
   const iconStyle = "hover:bg-gray-400 font-bold w-fit rounded-full";
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,7 +30,7 @@ const MessagesList = () => {
   useEffect(() => {
     const searchMessagesResults = async () => {
       const result = await Promise.all(
-        messageIds.map(async ({ id }) => {
+        messageIds.map(async ({ id, threadId }) => {
           // return dispatch(MessageContent({ id, profile, token }));
           const response = await axios.get(
             `https://gmail.googleapis.com/gmail/v1/users/${profile.email}/messages/${id}`,
@@ -48,9 +47,31 @@ const MessagesList = () => {
           return response.data;
         })
       );
+      // console.log("messages are: ", result);
       dispatch(setMessagesContent(result));
     };
-    searchMessagesResults();
+    const searchThreadsResults = async () => {
+      const result = await Promise.all(
+        messageIds.map(async ({ threadId }) => {
+          // return dispatch(MessageContent({ id, profile, token }));
+          const response = await axios.get(
+            `https://gmail.googleapis.com/gmail/v1/users/${profile.email}/threads/${threadId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+              },
+              params: {
+                format: "full",
+              },
+            }
+          );
+          return response.data;
+        })
+      );
+      // console.log(" threads are : ", result);
+    };
+    Promise.all([searchMessagesResults(), searchThreadsResults()]);
   }, [messageIds]);
   const handleNextList = async () => {
     var query;

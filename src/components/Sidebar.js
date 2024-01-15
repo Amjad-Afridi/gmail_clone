@@ -39,17 +39,17 @@ const Sidebar = () => {
       icon: <AiOutlineLogout />,
     },
   ];
-  const handleInbox = () => {
+  const handleInbox = async () => {
     const query = "is:inbox";
     dispatch(MessageList({ profile, token, query }));
     navigate("/messages-list");
   };
-  const handleSentMessages = () => {
+  const handleSentMessages = async () => {
     const query = "is:sent";
     dispatch(MessageList({ profile, token, query }));
     navigate("/sent-messages-list");
   };
-  const handleUnreadMessages = () => {
+  const handleUnreadMessages = async () => {
     const query = "is:unread";
     dispatch(MessageList({ profile, token, query }));
     navigate("/unread-messages-list");

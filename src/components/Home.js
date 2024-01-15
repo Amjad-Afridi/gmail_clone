@@ -3,10 +3,8 @@ import Sidebar from "./Sidebar";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutInfo } from "../Redux/Slices/UserSlice";
-import { UserProfile } from "../Redux/Thunks/UserProfile";
 import { useEffect } from "react";
 import { MessageList } from "../Redux/Thunks/MessageList";
-import MessagesList from "./MessagesList";
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,7 +21,9 @@ const Home = () => {
       const query = "is:inbox";
       dispatch(MessageList({ profile, token, query }));
     };
-    searchMessages();
+    const result = searchMessages();
+    console.log(" searched messages", result);
+
     navigate("/messages-list");
   }, [profile]);
 
