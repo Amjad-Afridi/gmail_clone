@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import FilePicker from "./FilePicker";
 function NewMessage() {
   const { token, profile } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -9,45 +10,79 @@ function NewMessage() {
   const [subject, setSubject] = useState("");
   const [textarea, setTextarea] = useState("");
   const [showMessage, setShowMessage] = useState(true);
+  const [files, setFiles] = useState([]);
   const commonFormsStyles = "border-b-[1px] pb-2 outline-none ";
 
+  const handleFileSelected = (files) => {
+    console.log("Selected files are: ", files);
+    setFiles(files);
+  };
+
+  async function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
   const submitForm = async (event) => {
     event.preventDefault();
-    console.log(" token is: ", token);
-    console.log(" profile: ", profile);
 
-    try {
-      const userId = profile.email; // Replace with the actual user ID
-      const accessToken = token; // Replace with the actual access token
+    {
+      try {
+        const userId = profile.email;
+        const accessToken = token;
 
-      const apiUrl = `https://gmail.googleapis.com/gmail/v1/users/${userId}/messages/send`;
+        const apiUrl = `https://gmail.googleapis.com/gmail/v1/users/${userId}/messages/send`;
 
-      const emailContent = `To: ${recipients}\r\nSubject: ${subject}\r\n\r\n${textarea}
-      `;
+        const boundary = "myboundary";
+        const subjectAndRecipients = `To: ${recipients}\r\nSubject: ${subject}\r\n`;
 
-      // Encoding the email content in base64
-      const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(emailContent))
-      );
+        const body = `${subjectAndRecipients}\r\nContent-Type: multipart/mixed; boundary=${boundary}\r\n\r\n--${boundary}\r\nContent-Type: text/plain; charset="UTF-8"\r\n\r\n${textarea}\r\n`;
 
-      const emailData = {
-        raw: base64EncodedEmail,
-      };
+        const attachments = await Promise.all(
+          files.map(async (file) => {
+            const content = await readFileAsBase64(file); // Read file content and convert to
+            return {
+              filename: file.name,
+              content: content,
+              type: file.type,
+            };
+          })
+        );
 
-      const response = await axios.post(apiUrl, emailData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+        // Constructing attachments
+        const attachmentContent = attachments
+          .map(
+            (attachment) => `
+    --${boundary}\r\nContent-Type: ${attachment.type}; name="${attachment.filename}"\r\nContent-Disposition: attachment; filename="${attachment.filename}"\r\nContent-Transfer-Encoding: base64\r\n\r\n${attachment.content}\r\n`
+          )
+          .join("");
 
-      console.log("Email sent successfully:", response.data);
-      alert("Email sent successfully");
-    } catch (error) {
-      console.error("Error sending email:", error.response || error);
+        const closingBoundary = `--${boundary}--\r\n`;
+
+        const emailContent = `${body}${attachmentContent}${closingBoundary}`;
+
+        const base64EncodedEmail = btoa(
+          unescape(encodeURIComponent(emailContent))
+        );
+
+        const emailData = {
+          raw: base64EncodedEmail,
+        };
+
+        const response = await axios.post(apiUrl, emailData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("message sent with response !", response.data);
+      } catch (error) {
+        console.error(error.message);
+      }
     }
-
-    // console.log("result after sending email ", response);
     setRecipients("");
     setTextarea("");
     setSubject("");
@@ -99,9 +134,14 @@ function NewMessage() {
               value={textarea}
               onChange={handleTextAreaChange}
             ></textarea>
-            <button className="bg-blue-700 hover:bg-blue-500 px-4 py-1 rounded-full text-white font-medium w-fit">
-              Send
-            </button>
+            <div className="flex gap-4 items-center">
+              <button className="bg-blue-700 hover:bg-blue-500 px-4 py-1 rounded-full text-white font-medium w-fit">
+                Send
+              </button>
+              <div>
+                <FilePicker onFileSelected={handleFileSelected} />
+              </div>
+            </div>
           </form>
         </div>
       )}

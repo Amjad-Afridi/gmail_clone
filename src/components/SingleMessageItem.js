@@ -30,19 +30,19 @@ const SingleMessageItem = () => {
         setAttachments(
           content.payload.parts &&
             content.payload.parts.filter(
-              (part) => part.filename && part.body.attachmentId,
-            ),
+              (part) => part.filename && part.body.attachmentId
+            )
         );
         console.log("attachments are: ", attachments);
         if (content.payload.parts.parts) {
           console.log(
             " when parts parts is true ",
-            content.payload.parts.parts[0],
+            content.payload.parts.parts[0]
           );
           setHtmlContent(
             content.payload.parts.parts[0].find(
-              (part) => part.mimeType === "text/html",
-            ),
+              (part) => part.mimeType === "text/html"
+            )
           );
         } else {
           if (content.payload.parts[0].body.size > 0) {
@@ -50,8 +50,8 @@ const SingleMessageItem = () => {
           } else {
             setHtmlContent(
               content.payload.parts[0].parts.find(
-                (part) => part.mimeType === "text/html",
-              ),
+                (part) => part.mimeType === "text/html"
+              )
             );
           }
         }
@@ -62,7 +62,7 @@ const SingleMessageItem = () => {
         console.log("content is: ", content);
         content.payload.parts &&
           setHtmlContent(
-            content.payload.parts.find((part) => part.mimeType === "text/html"),
+            content.payload.parts.find((part) => part.mimeType === "text/html")
           );
       }
     };
@@ -84,10 +84,10 @@ const SingleMessageItem = () => {
                 params: {
                   format: "full",
                 },
-              },
+              }
             );
             return response;
-          }),
+          })
         );
         setAttachmentsLoading(false);
         console.log("attachment responses are: ", responses);
@@ -133,10 +133,10 @@ const SingleMessageItem = () => {
       const emailContent = `To: ${emailText}\r\nSubject: ${subject}\r\nIn-Reply-To: ${
         content.id
       }\r\nFrom: ${profile.email}\r\nMIME-Version: 1.0\r\n\r\n${atob(
-        htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
+        htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
       )}`;
       const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(emailContent)),
+        unescape(encodeURIComponent(emailContent))
       );
 
       const emailData = {
@@ -169,16 +169,16 @@ const SingleMessageItem = () => {
         content.payload.headers.find((item) => item.name === "Subject").value
       }`;
       const replyTo = content.payload.headers.find(
-        (header) => header.name === "From",
+        (header) => header.name === "From"
       ).value;
       const messageId = content.payload.headers.find(
-        (header) => header.name === "Message-Id",
+        (header) => header.name === "Message-Id"
       ).value;
 
       const replyMessage = `To: ${replyTo}\r\nSubject: ${subject}\r\nReferences: ${messageId}\r\nIn-Reply-To: ${messageId}\r\n\r\n${replyText}`;
 
       const base64EncodedEmail = btoa(
-        unescape(encodeURIComponent(replyMessage)),
+        unescape(encodeURIComponent(replyMessage))
       );
 
       const emailData = {
@@ -217,7 +217,7 @@ const SingleMessageItem = () => {
                 <span className="font-extrabold mr-4">Subject: </span>
                 {content &&
                   content.payload.headers.filter(
-                    (item) => item.name === "Subject",
+                    (item) => item.name === "Subject"
                   )[0].value}
                 {content && console.log("content object: ", content)}
               </div>
@@ -227,7 +227,7 @@ const SingleMessageItem = () => {
               className=""
               dangerouslySetInnerHTML={{
                 __html: atob(
-                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/"),
+                  htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
                 ),
               }}
             />
@@ -239,7 +239,7 @@ const SingleMessageItem = () => {
                     console.log("attachment is : ", attachment);
                     const encodedData = attachmentResponse.data.data; // Assuming encoded data
                     const decodedData = atob(
-                      encodedData.replace(/-/g, "+").replace(/_/g, "/"),
+                      encodedData.replace(/-/g, "+").replace(/_/g, "/")
                     );
                     let url;
                     try {
@@ -267,7 +267,7 @@ const SingleMessageItem = () => {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className=" flex flex-col gap-4"
+                          className=" flex flex-col gap-3"
                         >
                           <p>{attachment.filename}</p>
                           {attachment.mimeType &&
@@ -276,21 +276,16 @@ const SingleMessageItem = () => {
                                 src={url}
                                 alt={attachment.filename}
                                 style={{
-                                  maxWidth: "100% ",
+                                  maxWidth: "100%",
                                   borderRadius: "8px",
                                 }}
                               />
                             )}
+                          Download item
                           {attachment.mimeType &&
                             attachment.mimeType === "application/pdf" && (
-                              <embed
-                                src={url}
-                                type="application/pdf"
-                                width="100%"
-                              />
+                              <embed src={url} type="application/pdf" />
                             )}
-                          {/* Add more conditions for other file types as needed */}
-                          Download item
                         </a>
                       </div>
                     );

@@ -18,7 +18,7 @@ const MessageItem = ({ content }) => {
       >
         {content.payload.headers.find((item) => item.name === "Subject")
           .value ? (
-          <div className="flex flex-row w-full">
+          <div className="flex flex-row items-center w-full">
             <span className="min-w-[25%]">
               {
                 content.payload.headers
