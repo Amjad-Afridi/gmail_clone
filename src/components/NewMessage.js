@@ -39,11 +39,11 @@ function NewMessage() {
         const boundary = "myboundary";
         const subjectAndRecipients = `To: ${recipients}\r\nSubject: ${subject}\r\n`;
 
-        const body = `${subjectAndRecipients}\r\nContent-Type: multipart/mixed; boundary=${boundary}\r\n\r\n--${boundary}\r\nContent-Type: text/plain; charset="UTF-8"\r\n\r\n${textarea}\r\n`;
+        const body = `${subjectAndRecipients}\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=${boundary}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${textarea}\r\n`;
 
         const attachments = await Promise.all(
           files.map(async (file) => {
-            const content = await readFileAsBase64(file); // Read file content and convert to
+            const content = await readFileAsBase64(file);
             return {
               filename: file.name,
               content: content,
@@ -55,8 +55,8 @@ function NewMessage() {
         // Constructing attachments
         const attachmentContent = attachments
           .map(
-            (attachment) => `
-    --${boundary}\r\nContent-Type: ${attachment.type}; name="${attachment.filename}"\r\nContent-Disposition: attachment; filename="${attachment.filename}"\r\nContent-Transfer-Encoding: base64\r\n\r\n${attachment.content}\r\n`
+            (attachment) =>
+              `--${boundary}\r\nContent-Type: ${attachment.type}; name="${attachment.filename}"\r\nContent-Disposition: attachment; filename="${attachment.filename}"\r\nContent-Transfer-Encoding: base64\r\n\r\n${attachment.content}\r\n`
           )
           .join("");
 

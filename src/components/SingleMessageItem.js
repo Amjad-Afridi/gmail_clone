@@ -132,7 +132,9 @@ const SingleMessageItem = () => {
 
       const emailContent = `To: ${emailText}\r\nSubject: ${subject}\r\nIn-Reply-To: ${
         content.id
-      }\r\nFrom: ${profile.email}\r\nMIME-Version: 1.0\r\n\r\n${atob(
+      }\r\nFrom: ${
+        profile.email
+      }\r\nMIME-Version: 1.0;\r\nContent-Type: text/html;\r\n\r\n${atob(
         htmlContent.body.data.replace(/-/g, "+").replace(/_/g, "/")
       )}`;
       const base64EncodedEmail = btoa(
@@ -199,10 +201,10 @@ const SingleMessageItem = () => {
       console.log(" error while replying: ", error.message);
     }
   };
-  const openAttachmentInNewTab = (blob) => {
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-  };
+  // const openAttachmentInNewTab = (blob) => {
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url, "_blank");
+  // };
 
   return (
     <>
